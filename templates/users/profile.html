@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}Profile{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md mt-8">
+    <h2 class="text-3xl font-bold mb-6 text-center text-blue-600">Profile</h2>
+    <div class="space-y-4">
+        <p><strong>Username:</strong> {{ user.username }}</p>
+        <p><strong>Email:</strong> {{ user.email }}</p>
+        <p><strong>First Name:</strong> {{ user.first_name }}</p>
+        <p><strong>Last Name:</strong> {{ user.last_name }}</p>
+        <p><strong>Phone Number:</strong> {{ user.phone_number }}</p>
+        <p><strong>Address:</strong> {{ user.address }}</p>
+    </div>
+
+    {% if user.is_authenticated %}
+        <div class="mt-6 text-center">
+            {% if user.role == 'student' %}
+                <a href="{% url 'complete_profile_student' %}" class="text-blue-600 hover:text-blue-500">Complete Student Profile</a>
+            {% elif user.role == 'donor' %}
+                <a href="{% url 'complete_profile_donor' %}" class="text-blue-600 hover:text-blue-500">Complete Donor Profile</a>
+            {% endif %}
+        </div>
+    {% endif %}
+
+    <div class="mt-4 text-center">
+        <a href="{% url 'homepage' %}" class="text-blue-600 hover:text-blue-500">Return to Homepage</a>
+    </div>
+</div>
+{% endblock %}

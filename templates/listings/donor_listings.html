@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Listings by {{ donor.username }}</h2>
+
+  <!-- Homepage Button -->
+  <a href="{% url 'homepage' %}" class="btn btn-primary">Homepage</a>
+  <ul>
+    {% for listing in listings %}
+      <li>
+        <a href="{% url 'listing_detail' listing.pk %}">{{ listing.title }}</a> - {{ listing.created_at }}
+        {% if listing.image %}
+          <img src="{{ listing.image.url }}" alt="{{ listing.title }}" style="max-width: 100px;">
+        {% endif %}
+      </li>
+    {% empty %}
+      <li>No listings found for this donor.</li>
+    {% endfor %}
+  </ul>
+
+  <!-- Pagination controls -->
+  <div class="pagination">
+    <span class="step-links">
+      {% if listings.has_previous %}
+        <a href="?page=1">&laquo; First</a>
+        <a href="?page={{ listings.previous_page_number }}">Previous</a>
+      {% endif %}
+
+      <span class="current">
+        Page {{ listings.number }} of {{ listings.paginator.num_pages }}.
+      </span>
+
+      {% if listings.has_next %}
+        <a href="?page={{ listings.next_page_number }}">Next</a>
+        <a href="?page={{ listings.paginator.num_pages }}">Last &raquo;</a>
+      {% endif %}
+    </span>
+  </div>
+{% endblock %}

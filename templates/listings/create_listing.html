@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Create a Listing</h2>
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    
+    <div>
+      <label for="title">Title:</label>
+      {{ form.title }}
+    </div>
+
+    <div>
+      <label for="description">Description:</label>
+      {{ form.description }}
+    </div>
+
+    <div>
+      <label for="address">Address:</label>
+      {{ form.address }}
+    </div>
+
+    <div>
+      <label for="categories">Categories:</label>
+      {{ form.categories }}
+    </div>
+
+    <!-- Expiry Dates for Specific Categories -->
+    <div>
+      <label for="expiry_date_canned">Expiry Date (Canned Goods):</label>
+      {{ form.expiry_date_canned }}
+    </div>
+
+    <div>
+      <label for="expiry_date_dry">Expiry Date (Dry Staples):</label>
+      {{ form.expiry_date_dry }}
+    </div>
+
+    <div>
+      <label for="expiry_date_beverages">Expiry Date (Beverages):</label>
+      {{ form.expiry_date_beverages }}
+    </div>
+
+    <div>
+      <label for="image">Image:</label>
+      {{ form.image }}
+    </div>
+
+    <button type="submit">Create Listing</button>
+  </form>
+{% endblock %}

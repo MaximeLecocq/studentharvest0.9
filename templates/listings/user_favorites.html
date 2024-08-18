@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Your Favorite Listings</h2>
+  <ul>
+    {% for listing in page_obj %}
+      <li>
+        <a href="{% url 'listing_detail' listing.pk %}">{{ listing.title }}</a>
+        by {{ listing.donor.username }}
+        {% if listing.image %}
+          <br><img src="{{ listing.image.url }}" alt="{{ listing.title }}" style="max-width: 150px;">
+        {% endif %}
+        
+        <!-- Remove from favorites button -->
+        <form action="{% url 'remove_from_favorites' listing.pk %}" method="post" style="display: inline;">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger">Remove from Favorites</button>
+        </form>
+      </li>
+    {% empty %}
+      <p>You have no favorite listings yet.</p>
+    {% endfor %}
+  </ul>
+
+  <!-- Pagination controls -->
+  <div class="pagination">
+    <span class="step-links">
+      {% if page_obj.has_previous %}
+        <a href="?page=1">&laquo; first</a>
+        <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+      {% endif %}
+
+      <span class="current">
+        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+      </span>
+
+      {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}">next</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+      {% endif %}
+    </span>
+  </div>
+
+  <a href="{% url 'homepage' %}" class="btn btn-secondary">Back to Homepage</a>
+{% endblock %}
