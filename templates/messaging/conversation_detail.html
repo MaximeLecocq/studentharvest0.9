@@ -1,0 +1,29 @@
+<!-- conversation_detail.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Chat about listing: {{ conversation.listing.title }}</h2>
+  <div>
+    <img src="{{ conversation.listing.image.url }}" alt="{{ conversation.listing.title }}" style="max-width: 150px;">
+    <p>{{ conversation.listing.description }}</p>
+  </div>
+
+  <div id="chat-box">
+    {% for message in messages %}
+      <div>
+        <strong>{{ message.sender.username }}</strong>: {{ message.text }}
+        <small>{{ message.timestamp }}</small>
+      </div>
+    {% endfor %}
+  </div>
+
+
+
+  <form method="POST">
+    {% csrf_token %}
+    <textarea name="message" rows="3" placeholder="Type your message"></textarea>
+    <button type="submit">Send</button>
+  </form>
+
+  <a href="{% url 'inbox' %}">Back to Inbox</a>
+{% endblock %}

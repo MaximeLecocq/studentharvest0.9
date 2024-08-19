@@ -24,5 +24,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('users/', include('users.urls')),
     path('listings/', include('listings.urls')),
+    path('messaging/', include('messaging.urls')),
     path('', listings_views.homepage, name='homepage'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

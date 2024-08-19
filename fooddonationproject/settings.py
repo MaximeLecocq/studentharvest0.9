@@ -34,6 +34,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'listings',
+    'messaging',
     'users.apps.UsersConfig',
     'django.contrib.admin',
     'django.contrib.auth',

@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Inbox</h2>
+  <ul>
+    {% for conversation in conversations %}
+      <li>
+        <a href="{% url 'conversation_detail' conversation.id %}">
+          {% if request.user == conversation.donor %}
+            Conversation with {{ conversation.student.username }}
+          {% else %}
+            Conversation with {{ conversation.donor.username }}
+          {% endif %}
+        </a>
+        started at {{ conversation.created_at }}
+      </li>
+    {% endfor %}
+  </ul>
+{% endblock %}
