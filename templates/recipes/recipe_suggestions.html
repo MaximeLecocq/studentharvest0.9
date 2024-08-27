@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block title %}Recipe Suggestions{% endblock %}
+
+{% block content %}
+    <!-- main container -->
+    <div class="max-w-4xl mx-auto p-8">
+
+        <!-- page title -->
+        <h1 class="text-4xl font-bold text-center text-gray-800 mb-8">Get Recipe Suggestions</h1>
+        
+        <!-- form section -->
+        <div class="bg-white p-6 rounded-lg shadow-lg">
+            <form method="get" action="{% url 'recipe_suggestions' %}" class="flex flex-col md:flex-row items-center gap-4">
+                <label for="ingredients" class="text-lg font-medium text-gray-700">Enter ingredients:</label>
+                <input type="text" id="ingredients" name="ingredients" 
+                       placeholder="e.g., tomato, onion, garlic" 
+                       value="{{ ingredients }}" 
+                       class="w-full md:w-2/3 p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500">
+                <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition">
+                    Get Recipes
+                </button>
+            </form>
+        </div>
+
+        <!-- recipe suggestions section -->
+        <div class="mt-10">
+            {% if recipes %}
+                <h2 class="text-2xl font-semibold text-gray-800 mb-6">Recipe Suggestions:</h2>
+                <ul class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+                    {% for recipe in recipes %}
+                        <li class="bg-white rounded-lg shadow-lg overflow-hidden">
+                            <img src="{{ recipe.image }}" alt="{{ recipe.title }}" class="w-full h-48 object-cover">
+                            <div class="p-4">
+                                <a href="{{ recipe.sourceUrl }}" class="text-lg font-bold text-blue-600 hover:text-blue-800 transition">{{ recipe.title }}</a>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="text-center text-lg text-gray-600 mt-8">No recipes found. Please enter some ingredients.</p>
+            {% endif %}
+        </div>
+        
+    </div>
+{% endblock %}
+

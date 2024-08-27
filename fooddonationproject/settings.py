@@ -35,6 +35,7 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'listings',
     'messaging',
+    'recipes',
     'users.apps.UsersConfig',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -55,6 +56,17 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'fooddonationproject.urls'
+
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'login'
+
+AUTHENTICATION_BACKENDS = [
+    'users.authentication_backends.EmailOrUsernameBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
 
 TEMPLATES = [
     {

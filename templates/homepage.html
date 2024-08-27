@@ -1,46 +1,174 @@
 {% extends 'base.html' %}
+{% load static %}
+{% block title %}Homepage{% endblock %}
 
 {% block content %}
-  <h2>Available Listings</h2>
-  <ul>
-
-    {% if query %}
-    <p>Search results for "{{ query }}":</p>
-    {% endif %}
-
-    {% for listing in page_obj %}
-      <li>
-        <a href="{% url 'listing_detail' listing.pk %}">{{ listing.title }}</a> by {{ listing.donor.username }} ({{ listing.created_at }})
-        {% if listing.image %}
-          <img src="{{ listing.image.url }}" alt="{{ listing.title }}" style="max-width: 100px;">
-        {% endif %}
-        <p><strong>Categories:</strong> 
-          {% for category in listing.categories_list %}
-            {{ category }}{% if not forloop.last %}, {% endif %}
-          {% endfor %}
-        </p>
-      </li>
-    {% empty %}
-      <li>No listings available.</li>
-    {% endfor %}
-  </ul>
-
-  <!-- Pagination controls -->
-  <div class="pagination">
-    <span class="step-links">
-      {% if page_obj.has_previous %}
-        <a href="?page=1">&laquo; First</a>
-        <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
-      {% endif %}
-
-      <span class="current">
-        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
-      </span>
-
-      {% if page_obj.has_next %}
-        <a href="?page={{ page_obj.next_page_number }}">Next</a>
-        <a href="?page={{ page_obj.paginator.num_pages }}">Last &raquo;</a>
-      {% endif %}
-    </span>
-  </div>
+<div class="flex">
+    <!-- sidebar for category filters and city search -->
+    <aside class="w-full lg:w-1/4 p-6 bg-gray-50 border-r border-gray-200 rounded-lg shadow-lg">
+        <h3 class="text-xl font-semibold mb-6 text-gray-800">Filter Listings</h3>
+        <form method="get" action="{% url 'homepage' %}" class="space-y-6">
+            {% csrf_token %}
+            
+            <!-- main search form (title only) -->
+            <div>
+                <label for="id_title" class="block text-sm font-medium text-gray-700">Title:</label>
+                <input 
+                    type="text" 
+                    name="title" 
+                    id="id_title" 
+                    value="{{ request.GET.title }}" 
+                    class="block w-full px-4 py-2 mt-1 text-gray-900 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="Search by title..."
+                />
+            </div>
+    
+            <!-- category checkboxes -->
+            <div>
+                <p class="block text-sm font-medium text-gray-700 mb-2">Categories:</p>
+                {% for category, label in search_form.categories.field.choices %}
+                    <div class="flex items-center mb-2">
+                        <input 
+                            type="checkbox" 
+                            name="categories" 
+                            value="{{ category }}" 
+                            id="category_{{ category }}" 
+                            class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                            {% if category in selected_categories %} checked {% endif %}
+                        />
+                        <label for="category_{{ category }}" class="ml-3 text-gray-600">{{ label }}</label>
+                    </div>
+                {% endfor %}
+            </div>
+    
+            <!-- city search -->
+            <div>
+                <label for="id_city" class="block text-sm font-medium text-gray-700">City/Town:</label>
+                <input 
+                    type="text" 
+                    name="city" 
+                    id="id_city" 
+                    value="{{ request.GET.city }}" 
+                    class="block w-full px-4 py-2 mt-1 text-gray-900 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="Enter city or town..."
+                />
+            </div>
+    
+            <!-- filter and reset buttons -->
+            <div class="flex justify-between items-center">
+                <button 
+                    type="submit" 
+                    class="w-full sm:w-auto px-6 py-2 bg-blue-600 text-white font-medium rounded-md shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition duration-150"
+                >
+                    Apply Filters
+                </button>
+                <button 
+                    type="button" 
+                    id="reset-filters" 
+                    class="ml-4 w-full sm:w-auto px-6 py-2 bg-gray-600 text-white font-medium rounded-md shadow hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition duration-150"
+                >
+                    Reset Filters
+                </button>
+            </div>
+        </form>
+    </aside>
+    
+    <!-- main content area -->
+    <main class="w-full lg:w-3/4 p-6">
+        <!-- listings display -->
+        <h2 class="text-3xl font-semibold mb-6 text-gray-800">Available Listings</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for listing in page_obj %}
+            <div class="bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden">
+                <!-- listing image -->
+                {% if listing.image1 %}
+                    <a href="{% url 'listing_detail' listing.pk %}">
+                        <img src="{{ listing.image1.url }}" alt="{{ listing.title }}" class="w-full h-40 object-cover">
+                    </a>
+                {% else %}
+                    <a href="{% url 'listing_detail' listing.pk %}">
+                        <img src="{% static 'images/listing-placeholder.jpg' %}" alt="No image available" class="w-full h-40 object-cover">
+                    </a>
+                {% endif %}
+            
+                <!-- listing content -->
+                <div class="p-4">
+                    <!-- title -->
+                    <h3 class="text-lg font-semibold mb-2">
+                        <a href="{% url 'listing_detail' listing.pk %}" class="text-blue-600 hover:underline">{{ listing.title }}</a>
+                    </h3>
+                    
+                    <!-- donor information with avatar -->
+                    <div class="flex items-center mb-2">
+                        <!-- donor avatar -->
+                        {% if listing.donor.avatar %}
+                            <img src="{{ listing.donor.avatar.url }}" alt="{{ listing.donor.username }}" class="w-8 h-8 rounded-full object-cover mr-2">
+                        {% else %}
+                            <img src="{% static 'images/default_avatar.png' %}" alt="{{ listing.donor.username }}" class="w-8 h-8 rounded-full object-cover mr-2">
+                        {% endif %}
+                        <!-- donor username -->
+                        <p class="text-sm text-gray-600">
+                            <span>Donated by</span> 
+                            <a href="{% url 'donor_profile' listing.donor.id %}" class="text-blue-600 hover:underline">{{ listing.donor.username }}</a>
+                        </p>
+                    </div>
+            
+                    <!-- categories -->
+                    <p class="text-sm text-gray-600 mb-2">
+                        <strong>Categories:</strong>
+                        {% for category in listing.categories_list %}
+                            {{ category }}{% if not forloop.last %}, {% endif %}
+                        {% endfor %}
+                    </p>
+            
+                    <!-- city and expiry date -->
+                    <div class="text-sm text-gray-600">
+                        <p><strong>City:</strong> {{ listing.city }}</p>
+                        <p><strong>Expiry:</strong>
+                            {% if listing.expiry_date_canned %}
+                                {{ listing.expiry_date_canned|date:"M d, Y" }}
+                            {% elif listing.expiry_date_dry %}
+                                {{ listing.expiry_date_dry|date:"M d, Y" }}
+                            {% elif listing.expiry_date_beverages %}
+                                {{ listing.expiry_date_beverages|date:"M d, Y" }}
+                            {% else %}
+                                No expiry date
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            {% empty %}
+                <p class="col-span-3 text-center text-gray-600">No listings available.</p>
+            {% endfor %}
+        </div>
+    
+        <!-- pagination controls -->
+        <div class="mt-8">
+            <nav class="flex justify-between items-center">
+                {% if page_obj.has_previous %}
+                    <a href="?page=1" class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">&laquo; First</a>
+                    <a href="?page={{ page_obj.previous_page_number }}" class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">Previous</a>
+                {% else %}
+                    <span class="px-4 py-2 bg-gray-100 rounded text-gray-500">&laquo; First</span>
+                    <span class="px-4 py-2 bg-gray-100 rounded text-gray-500">Previous</span>
+                {% endif %}
+    
+                <span class="px-4 py-2 bg-gray-200 rounded">
+                    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                </span>
+    
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}" class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">Next</a>
+                    <a href="?page={{ page_obj.paginator.num_pages }}" class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">Last &raquo;</a>
+                {% else %}
+                    <span class="px-4 py-2 bg-gray-100 rounded text-gray-500">Next</span>
+                    <span class="px-4 py-2 bg-gray-100 rounded text-gray-500">Last &raquo;</span>
+                {% endif %}
+            </nav>
+        </div>
+    </main>
+    
+</div>
 {% endblock %}

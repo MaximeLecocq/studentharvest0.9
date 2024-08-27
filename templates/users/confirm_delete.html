@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Deletion Confirmation{% endblock %}
+
+{% block content %}
+    <!--main section for account deletion confirmation -->
+    <section class="py-10 px-6 mx-auto max-w-xl text-center">
+        <h2 class="text-3xl font-semibold mb-6 text-gray-900">Confirm Account Deletion</h2>
+        <p class="text-lg text-gray-700 mb-4">
+            Are you sure you want to delete your account? This action is irreversible.
+        </p>
+        <!-- form that submits the deletion request -->
+        <form method="post" action="{% url 'delete_account' %}">
+            {% csrf_token %}
+            <button type="submit" class="bg-red-600 text-white font-semibold py-2 px-4 rounded-md transition duration-150 ease-in-out hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50">
+                Yes, Delete My Account
+            </button>
+            <a href="{% url 'profile' %}" class="inline-block ml-4 text-blue-600 hover:text-blue-500 font-semibold">Cancel</a>
+        </form>
+    </section>
+{% endblock %}

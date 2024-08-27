@@ -1,31 +1,57 @@
 {% extends "base.html" %}
-
+{% load static %}
 {% block title %}Profile{% endblock %}
 
 {% block content %}
-<div class="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md mt-8">
-    <h2 class="text-3xl font-bold mb-6 text-center text-blue-600">Profile</h2>
-    <div class="space-y-4">
-        <p><strong>Username:</strong> {{ user.username }}</p>
-        <p><strong>Email:</strong> {{ user.email }}</p>
-        <p><strong>First Name:</strong> {{ user.first_name }}</p>
-        <p><strong>Last Name:</strong> {{ user.last_name }}</p>
-        <p><strong>Phone Number:</strong> {{ user.phone_number }}</p>
-        <p><strong>Address:</strong> {{ user.address }}</p>
-    </div>
+<body>
+    <section class="py-10 px-6 mx-auto max-w-4xl">
+        <div class="bg-white rounded-lg border border-gray-200 shadow-md p-6">
+            <!-- profile header -->
+            <div class="flex flex-col items-center lg:flex-row lg:items-start">
+                <!-- avatar section -->
+                <div class="flex-shrink-0 mb-6 lg:mb-0 lg:w-1/3 flex justify-center">
+                    <div class="flex flex-col items-center">
+                        <h2 class="text-2xl font-semibold mb-4 text-gray-800">Profile</h2>
+                        <img src="{% if user.avatar %}{{ user.avatar.url }}{% else %}{% static 'images/avatars/avatarplaceholder.jpg' %}{% endif %}"
+                             alt="{{ user.username }}'s Avatar"
+                             class="w-40 h-40 object-cover rounded-full border border-gray-300">
+                    </div>
+                </div>
+    
+                <!-- profile details -->
+                <div class="lg:w-2/3 lg:pl-6">
+                    <div class="space-y-4">
+                        <p><strong>Username:</strong> {{ user.username }}</p>
+                        <p><strong>Email:</strong> {{ user.email }}</p>
+                        <p><strong>First Name:</strong> {{ user.first_name }}</p>
+                        <p><strong>Last Name:</strong> {{ user.last_name }}</p>
+                        <p><strong>Phone Number:</strong> {{ user.phone_number }}</p>
+                        <p><strong>Street Number and Name:</strong> {{ user.street_address }}</p>
+                        <p><strong>City/Town:</strong> {{ user.city_town }}</p>
+                        <p><strong>About:</strong> {{ user.about }}</p>
+                    </div>
+    
+                    {% if user.is_authenticated %}
+                        <div class="mt-6">
+                            {% if user.role == 'student' %}
+                                <a href="{% url 'complete_profile_student' %}" class="text-blue-600 hover:text-blue-500 font-semibold">Edit your Profile</a>
+                            {% elif user.role == 'donor' %}
+                                <a href="{% url 'complete_profile_donor' %}" class="text-blue-600 hover:text-blue-500 font-semibold">Edit your Donor Profile</a>
+                                <a href="{% url 'donor_listings' user.id %}" class="text-blue-600 hover:text-blue-500 font-semibold mt-2 block">View My Listings</a>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+    
+                    <div class="mt-6">
+                        <a href="{% url 'homepage' %}" class="text-blue-600 hover:text-blue-500 font-semibold">Return to Homepage</a>
+                    </div>
 
-    {% if user.is_authenticated %}
-        <div class="mt-6 text-center">
-            {% if user.role == 'student' %}
-                <a href="{% url 'complete_profile_student' %}" class="text-blue-600 hover:text-blue-500">Complete Student Profile</a>
-            {% elif user.role == 'donor' %}
-                <a href="{% url 'complete_profile_donor' %}" class="text-blue-600 hover:text-blue-500">Complete Donor Profile</a>
-            {% endif %}
+                    <div class="mt-6">
+                        <a href="{% url 'delete_account_confirm' %}" class="text-red-600 hover:text-red-500 font-semibold">Delete Account</a>
+                    </div>
+                </div>
+            </div>
         </div>
-    {% endif %}
-
-    <div class="mt-4 text-center">
-        <a href="{% url 'homepage' %}" class="text-blue-600 hover:text-blue-500">Return to Homepage</a>
-    </div>
-</div>
+    </section>
+</body>
 {% endblock %}

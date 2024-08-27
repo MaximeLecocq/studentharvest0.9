@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Donor Profile{% endblock %}
+
+{% block content %}
+  <div class="max-w-4xl mx-auto p-6">
+    <!-- profile section -->
+    <div class="flex items-center space-x-6 mb-8">
+      <a href="{% if donor.avatar %}{{ donor.avatar.url }}{% else %}{% static 'images/avatars/avatarplaceholder.jpg' %}{% endif %}" class="block">
+        <img src="{% if donor.avatar %}{{ donor.avatar.url }}{% else %}{% static 'images/avatars/avatarplaceholder.jpg' %}{% endif %}" alt="{{ donor.username }}'s Avatar" class="w-32 h-32 object-cover rounded-full border border-gray-300" id="donor-avatar">
+      </a>
+      
+      <div>
+        <h2 class="text-3xl font-bold mb-2">{{ donor.username }}'s Profile</h2>
+        <p class="text-gray-600">Listings by {{ donor.username }}:</p>
+      </div>
+    </div>
+
+    <!-- listings section -->
+    <div class="space-y-6">
+      <!-- about section (if filled) -->
+      {% if donor.about %}
+        <div class="p-4 bg-gray-100 rounded-lg shadow-md">
+          <h2 class="text-lg font-semibold text-gray-800">About the Donor</h2>
+          <p class="text-gray-700 mt-2">{{ donor.about }}</p>
+        </div>
+      {% endif %}
+    
+      <!-- listings section -->
+      {% if listings %}
+        <ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {% for listing in listings %}
+            <li class="border border-gray-200 rounded-lg shadow-sm p-4 bg-white flex flex-col items-start">
+              <!-- title and image -->
+              <a href="{% url 'listing_detail' listing.pk %}" class="text-blue-600 text-lg font-semibold hover:underline mb-2">
+                {{ listing.title }}
+              </a>
+              <a href="{% url 'listing_detail' listing.pk %}" class="block w-full mb-4">
+                {% if listing.image1 %}
+                  <img src="{{ listing.image1.url }}" alt="{{ listing.title }}" class="rounded-md">
+                {% else %}
+                  <img src="{% static 'images/listings/placeholder.jpg' %}" alt="Default Image" class="rounded-md">
+                {% endif %}
+              </a>
+    
+              <!-- vertical buttons -->
+              <div class="mt-6 flex flex-col space-y-2 w-full">
+                {% if user.is_authenticated and user.role == 'student' %}
+                  {% if request.user in listing.favorites.all %}
+                    <a href="{% url 'remove_from_favorites' listing.pk %}" class="block px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-center">Remove from Favorites</a>
+                  {% else %}
+                    <a href="{% url 'add_to_favorites' listing.pk %}" class="block px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-center">Add to Favorites</a>
+                  {% endif %}
+                {% endif %}
+    
+                {% if user.is_authenticated and user != listing.donor %}
+                  <a href="{% url 'start_conversation' listing.pk %}" class="block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-center">Request</a>
+                {% endif %}
+              </div>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="text-gray-600">No listings available from this donor.</p>
+      {% endif %}
+    </div>
+
+    <!-- back to homepage button -->
+    <div class="mt-8 text-center">
+      <a href="{% url 'homepage' %}" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300">Back to Homepage</a>
+    </div>
+  </div>
+
+{% endblock %}

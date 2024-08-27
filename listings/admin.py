@@ -6,5 +6,5 @@ class ListingAdmin(admin.ModelAdmin):
     list_filter = ('created_at', 'expiry_date_canned', 'expiry_date_dry', 'expiry_date_beverages')
     search_fields = ('title', 'description', 'donor__username')
 
+#register the Listing model with the custom ListingAdmin options in the Django admin site
 admin.site.register(Listing, ListingAdmin)
-

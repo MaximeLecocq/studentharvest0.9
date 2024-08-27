@@ -1,19 +1,53 @@
 {% extends 'base.html' %}
+{% load static %}
+{% block title %}Inbox{% endblock %}
 
 {% block content %}
   <h2>Inbox</h2>
-  <ul>
+  <ul class="space-y-4">
     {% for conversation in conversations %}
-      <li>
-        <a href="{% url 'conversation_detail' conversation.id %}">
+      <li class="flex items-center justify-between p-4 border rounded-md shadow-sm">
+        <!-- conversation info -->
+        <div class="flex-grow flex items-center space-x-4">
+          <!-- avatar of the other party -->
           {% if request.user == conversation.donor %}
-            Conversation with {{ conversation.student.username }}
+            {% if conversation.student.avatar %}
+              <img src="{{ conversation.student.avatar.url }}" alt="{{ conversation.student.username }}'s Avatar" class="h-12 w-12 object-cover rounded-full">
+            {% else %}
+              <img src="{% static 'images/avatars/avatarplaceholder.jpg' %}" alt="Avatar Placeholder" class="h-12 w-12 object-cover rounded-full">
+            {% endif %}
           {% else %}
-            Conversation with {{ conversation.donor.username }}
+            {% if conversation.donor.avatar %}
+              <img src="{{ conversation.donor.avatar.url }}" alt="{{ conversation.donor.username }}'s Avatar" class="h-12 w-12 object-cover rounded-full">
+            {% else %}
+              <img src="{% static 'images/avatars/avatarplaceholder.jpg' %}" alt="Avatar Placeholder" class="h-12 w-12 object-cover rounded-full">
+            {% endif %}
           {% endif %}
-        </a>
-        started at {{ conversation.created_at }}
+
+          <div>
+            <a href="{% url 'conversation_detail' conversation.id %}" class="text-blue-600 hover:underline">
+              {% if request.user == conversation.donor %}
+                Conversation with {{ conversation.student.username }}
+              {% else %}
+                Conversation with {{ conversation.donor.username }}
+              {% endif %}
+            </a>
+            <p class="text-gray-600">Started at {{ conversation.created_at|date:"F j, Y, g:i a" }}</p>
+          </div>
+        </div>
+
+        <!-- listing image -->
+        {% if conversation.listing.image1 %}
+          <img src="{{ conversation.listing.image1.url }}" alt="{{ conversation.listing.title }}" class="h-16 w-16 object-cover rounded-md">
+        {% else %}
+          <img src="{% static 'images/listings/placeholder.jpg' %}" alt="Default Image" class="h-16 w-16 object-cover rounded-md">
+        {% endif %}
       </li>
+    {% empty %}
+      <li>No conversations found.</li>
     {% endfor %}
+    <div class="mt-6 text-center">
+      <a href="{% url 'homepage' %}" class="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Go to Homepage</a>
+    </div>
   </ul>
 {% endblock %}

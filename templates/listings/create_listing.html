@@ -1,52 +1,142 @@
 {% extends 'base.html' %}
+{% block title %}Create Listing{% endblock %}
 
 {% block content %}
-  <h2>Create a Listing</h2>
-  <form method="post" enctype="multipart/form-data">
+  <h2 class="text-2xl font-bold mb-6">Create a Listing</h2>
+  <form method="post" enctype="multipart/form-data" class="space-y-6">
     {% csrf_token %}
     {{ form.non_field_errors }}
-    
-    <div>
-      <label for="title">Title:</label>
-      {{ form.title }}
+
+    <!-- grid for form fields -->
+    <div class="grid grid-cols-1 gap-6">
+      <!-- title input -->
+      <div class="space-y-2">
+        <label for="{{ form.title.id_for_label }}" class="block text-sm font-medium text-gray-700">Title:</label>
+        {{ form.title }}
+        {% if form.title.errors %}
+          <div class="text-red-600 text-sm mt-1">{{ form.title.errors }}</div>
+        {% endif %}
+      </div>
+
+      <!-- description input -->
+      <div class="space-y-2">
+        <label for="{{ form.description.id_for_label }}" class="block text-sm font-medium text-gray-700">Description:</label>
+        {{ form.description }}
+        {% if form.description.errors %}
+          <div class="text-red-600 text-sm mt-1">{{ form.description.errors }}</div>
+        {% endif %}
+      </div>
+
+      <!-- street address input -->
+      <div class="space-y-2">
+        <label for="{{ form.street_address.id_for_label }}" class="block text-sm font-medium text-gray-700">Street Address:</label>
+        {{ form.street_address }}
+        {% if form.street_address.errors %}
+          <div class="text-red-600 text-sm mt-1">{{ form.street_address.errors }}</div>
+        {% endif %}
+      </div>
+
+      <!-- city/town input -->
+      <div class="space-y-2">
+        <label for="{{ form.city.id_for_label }}" class="block text-sm font-medium text-gray-700">City/Town:</label>
+        {{ form.city }}
+        {% if form.city.errors %}
+          <div class="text-red-600 text-sm mt-1">{{ form.city.errors }}</div>
+        {% endif %}
+      </div>
     </div>
 
-    <div>
-      <label for="description">Description:</label>
-      {{ form.description }}
+    <!-- categories and expiry dates section -->
+    <div class="border-b border-gray-300 py-4 flex items-center space-x-4">
+      <div class="flex items-center">
+        <input type="checkbox" name="categories" value="canned" id="canned" class="mr-2">
+        <label for="canned" class="text-sm font-medium text-gray-700">Canned Goods</label>
+      </div>
+      <div class="w-full">
+        <label for="{{ form.expiry_date_canned.id_for_label }}" class="block text-sm font-medium text-gray-700">Expiry Date:</label>
+        {{ form.expiry_date_canned }}
+        {% if form.expiry_date_canned.errors %}
+          <div class="text-red-600 text-sm mt-1">{{ form.expiry_date_canned.errors }}</div>
+        {% endif %}
+      </div>
     </div>
 
-    <div>
-      <label for="address">Address:</label>
-      {{ form.address }}
+    <div class="border-b border-gray-300 py-4 flex items-center space-x-4">
+      <div class="flex items-center">
+        <input type="checkbox" name="categories" value="dry" id="dry" class="mr-2">
+        <label for="dry" class="text-sm font-medium text-gray-700">Dry Staples</label>
+      </div>
+      <div class="w-full">
+        <label for="{{ form.expiry_date_dry.id_for_label }}" class="block text-sm font-medium text-gray-700">Expiry Date:</label>
+        {{ form.expiry_date_dry }}
+        {% if form.expiry_date_dry.errors %}
+          <div class="text-red-600 text-sm mt-1">{{ form.expiry_date_dry.errors }}</div>
+        {% endif %}
+      </div>
     </div>
 
-    <div>
-      <label for="categories">Categories:</label>
-      {{ form.categories }}
+    <div class="border-b border-gray-300 py-4 flex items-center space-x-4">
+      <div class="flex items-center">
+        <input type="checkbox" name="categories" value="beverages" id="beverages" class="mr-2">
+        <label for="beverages" class="text-sm font-medium text-gray-700">Beverages</label>
+      </div>
+      <div class="w-full">
+        <label for="{{ form.expiry_date_beverages.id_for_label }}" class="block text-sm font-medium text-gray-700">Expiry Date:</label>
+        {{ form.expiry_date_beverages }}
+        {% if form.expiry_date_beverages.errors %}
+          <div class="text-red-600 text-sm mt-1">{{ form.expiry_date_beverages.errors }}</div>
+        {% endif %}
+      </div>
     </div>
 
-    <!-- Expiry Dates for Specific Categories -->
-    <div>
-      <label for="expiry_date_canned">Expiry Date (Canned Goods):</label>
-      {{ form.expiry_date_canned }}
+    <!-- add fresh vegetables checkbox -->
+    <div class="border-b border-gray-300 py-4 flex items-center space-x-4">
+      <div class="flex items-center">
+        <input type="checkbox" name="categories" value="vegetables" id="vegetables" class="mr-2">
+        <label for="vegetables" class="text-sm font-medium text-gray-700">Fresh Vegetables</label>
+      </div>
     </div>
 
-    <div>
-      <label for="expiry_date_dry">Expiry Date (Dry Staples):</label>
-      {{ form.expiry_date_dry }}
+    <!-- add fruits checkbox -->
+    <div class="border-b border-gray-300 py-4 flex items-center space-x-4">
+      <div class="flex items-center">
+        <input type="checkbox" name="categories" value="fruits" id="fruits" class="mr-2">
+        <label for="fruits" class="text-sm font-medium text-gray-700">Fruits</label>
+      </div>
     </div>
 
-    <div>
-      <label for="expiry_date_beverages">Expiry Date (Beverages):</label>
-      {{ form.expiry_date_beverages }}
+    <!-- image upload section -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="space-y-2">
+        <label for="{{ form.image1.id_for_label }}" class="block text-sm font-medium text-gray-700">Main Image (required):</label>
+        {{ form.image1 }}
+        {% if form.image1.errors %}
+          <div class="text-red-600 text-sm mt-1">{{ form.image1.errors }}</div>
+        {% endif %}
+      </div>
+
+      <div class="space-y-2">
+        <label for="{{ form.image2.id_for_label }}" class="block text-sm font-medium text-gray-700">Optional Image 2:</label>
+        {{ form.image2 }}
+        {% if form.image2.errors %}
+          <div class="text-red-600 text-sm mt-1">{{ form.image2.errors }}</div>
+        {% endif %}
+      </div>
+
+      <div class="space-y-2">
+        <label for="{{ form.image3.id_for_label }}" class="block text-sm font-medium text-gray-700">Optional Image 3:</label>
+        {{ form.image3 }}
+        {% if form.image3.errors %}
+          <div class="text-red-600 text-sm mt-1">{{ form.image3.errors }}</div>
+        {% endif %}
+      </div>
     </div>
 
-    <div>
-      <label for="image">Image:</label>
-      {{ form.image }}
+    <!-- centering the button -->
+    <div class="flex justify-center pt-8">
+      <button type="submit" class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+        Create Listing
+      </button>
     </div>
-
-    <button type="submit">Create Listing</button>
   </form>
 {% endblock %}

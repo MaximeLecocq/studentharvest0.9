@@ -1,13 +1,11 @@
 from django.db import models
 from django.conf import settings
-from listings.models import Listing  # Import the Listing model to relate messages to a specific listing
-from users.models import User  # Correctly import the User model
-
+from listings.models import Listing
 
 class Conversation(models.Model):
-    student = models.ForeignKey(User, related_name='student_conversations', on_delete=models.CASCADE)
-    donor = models.ForeignKey(User, related_name='donor_conversations', on_delete=models.CASCADE)
-    listing = models.ForeignKey(Listing, related_name='conversations', on_delete=models.CASCADE)  # Link to Listing
+    student = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='student_conversations', on_delete=models.CASCADE)
+    donor = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='donor_conversations', on_delete=models.CASCADE)
+    listing = models.ForeignKey(Listing, related_name='conversations', on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -20,4 +18,4 @@ class Message(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Message from {self.sender.username} at {self.timestamp}"
+        return f"Message from {self.sender} at {self.timestamp}"

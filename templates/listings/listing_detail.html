@@ -1,42 +1,154 @@
 {% extends 'base.html' %}
+{% load static %}
+{% block title %}Listing Detail{% endblock %}
 
 {% block content %}
-  <h2>{{ listing.title }}</h2>
-  <p><strong>Description:</strong> {{ listing.description }}</p>
-  <p><strong>Address:</strong> {{ listing.address }}</p>
-  <p><strong>Categories:</strong> 
-    {% for category in categories_list %}
-      {{ category }},
-    {% endfor %}
-  </p>
-  <p><strong>Expiry Date:</strong> {{ listing.expiry_date }}</p>
-  {% if listing.image %}
-    <img src="{{ listing.image.url }}" alt="{{ listing.title }}">
-  {% endif %}
+<div class="max-w-6xl mx-auto p-6 bg-white">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- listing details section -->
+        <div>
+            <h2 class="text-3xl font-semibold text-gray-800 mb-4">{{ listing.title }}</h2>
+            <p class="text-gray-700 mb-6">
+                <strong>Description:</strong> {{ listing.description }}
+            </p>
+    
+            <p class="text-gray-700 mb-4">
+                <strong>Categories:</strong>
+                {% for category in categories_list %}
+                    {{ category }}{% if not forloop.last %}, {% endif %}
+                {% endfor %}
+            </p>
+    
+            <p class="text-gray-700 mb-4">
+                <strong>Expiry Date:</strong> {{ listing.expiry_date }}
+            </p>
+    
+            {% if user.is_authenticated %}
+                <p class="text-gray-700 mb-4">
+                    <strong>City/Town:</strong> {{ listing.city }}
+                </p>
+                <p class="text-gray-700 mb-4">
+                    <strong>Street Address:</strong> {{ listing.street_address }}
+                </p>
+            {% else %}
+                <p class="text-gray-700 mb-4">
+                    <strong>City/Town:</strong> {{ listing.city }}
+                </p>
+                <p class="text-gray-700 mb-4">
+                    <strong>Street Address:</strong> <em>You need to log in to view the street address</em>
+                </p>
+                <a href="{% url 'login' %}" class="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Log in to view address</a>
+            {% endif %}
+    
+            <!-- donor information section -->
+            <div class="mt-6 p-4 bg-gray-100 rounded-lg shadow-md flex items-center space-x-4">
+                {% if listing.donor.avatar %}
+                    <img src="{{ listing.donor.avatar.url }}" alt="{{ listing.donor.username }}" class="w-16 h-16 rounded-full object-cover">
+                {% else %}
+                    <img src="{% static 'images/default_avatar.png' %}" alt="{{ listing.donor.username }}" class="w-16 h-16 rounded-full object-cover">
+                {% endif %}
+                <div>
+                    <a href="{% url 'donor_profile' listing.donor.pk %}" class="text-xl font-semibold text-indigo-600 hover:underline">
+                        {{ listing.donor.username }}
+                    </a>
+                    <p class="text-gray-600">Donor</p>
+                    <a href="{% url 'donor_listings' listing.donor.pk %}" class="text-sm text-indigo-500 hover:underline">
+                        View other listings by {{ listing.donor.username }}
+                    </a>
+                </div>
+            </div>
+    
+            <div class="mt-6">
+                <!-- check if the user is authenticated and is a student -->
+                {% if user.is_authenticated and user.role == 'student' %}
+                    <!-- add to/remove from favorites button -->
+                    {% if request.user in listing.favorites.all %}
+                        <a href="{% url 'remove_from_favorites' listing.pk %}" class="inline-block px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">Remove from Favorites</a>
+                    {% else %}
+                        <a href="{% url 'add_to_favorites' listing.pk %}" class="inline-block px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">Add to Favorites</a>
+                    {% endif %}
+            
+                    <!-- check if the student has completed their profile -->
+                    {% if request.user.complete_profile_student %}
+                        <!-- show request button Only if profile is completed -->
+                        <a href="{% url 'start_conversation' listing.pk %}" class="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 mt-4">Request</a>
+                    {% else %}
+                        <!-- profile incomplete message -->
+                        <div class="mt-4 p-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 rounded-lg">
+                            <p class="font-semibold">Please complete your profile to contact the donor.</p>
+                            <p class="text-sm mt-2">Once your profile is complete, you'll be able to request this item.</p>
+                            <a href="{% url 'complete_profile_student' %}" class="inline-block mt-4 px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700">
+                                Complete Your Profile
+                            </a>
+                        </div>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+    
+        <!-- listing images section -->
+        <div class="space-y-4">
+            <div class="flex flex-col space-y-4">
+                {% if listing.image1 %}
+                    <a href="{{ listing.image1.url }}" target="_blank">
+                        <img src="{{ listing.image1.url }}" alt="{{ listing.title }}" class="w-full h-auto rounded-lg shadow-md object-cover" style="max-height: 400px;">
+                    </a>
+                {% endif %}
+                <div class="flex space-x-4">
+                    {% if listing.image2 %}
+                        <a href="{{ listing.image2.url }}" target="_blank">
+                            <img src="{{ listing.image2.url }}" alt="{{ listing.title }}" class="w-1/2 h-auto rounded-lg shadow-md object-cover" style="max-height: 200px;">
+                        </a>
+                    {% endif %}
+                    {% if listing.image3 %}
+                        <a href="{{ listing.image3.url }}" target="_blank">
+                            <img src="{{ listing.image3.url }}" alt="{{ listing.title }}" class="w-1/2 h-auto rounded-lg shadow-md object-cover" style="max-height: 200px;">
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
 
-  {% if request.user in listing.favorites.all %}
-    <a href="{% url 'remove_from_favorites' listing.pk %}" class="btn btn-danger">Remove from Favorites</a>
-  {% else %}
-    <a href="{% url 'add_to_favorites' listing.pk %}" class="btn btn-primary">Add to Favorites</a>
-  {% endif %}
+    <!-- owner controls section -->
+    {% if is_owner %}
+        <div class="mt-6 text-right">
+            <a href="{% url 'edit_listing' listing.pk %}" class="inline-block px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600">Edit Listing</a>
+            <form action="{% url 'delete_listing' listing.pk %}" method="post" class="inline-block">
+                {% csrf_token %}
+                <button type="submit" class="inline-block px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700" onclick="return confirm('Are you sure you want to delete this listing?');">Delete Listing</button>
+            </form>
+        </div>
+    {% endif %}
 
-  <!-- listing_detail.html -->
-  {% if user.is_authenticated and user != listing.donor %}
-      <a href="{% url 'start_conversation' listing.pk %}" class="btn btn-primary">Request</a>
-  {% endif %}
+    <!-- recipe suggestions section -->
+    <div class="mt-10">
+        <h3 class="text-2xl font-semibold text-gray-800 mb-4">Recipe Suggestions</h3>
+        {% if recipes %}
+            <ul class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                {% for recipe in recipes %}
+                    <li class="bg-gray-100 p-4 rounded-lg shadow-md">
+                        <a href="{{ recipe.sourceUrl }}" target="_blank" class="text-blue-600 hover:underline">
+                            <h4 class="text-lg font-semibold mb-2">{{ recipe.title }}</h4>
+                        </a>
+                        <img src="{{ recipe.image }}" alt="{{ recipe.title }}" class="w-full h-40 object-cover rounded-lg">
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="text-gray-700">No recipe suggestions available.</p>
+        {% endif %}
+    </div>
 
-
-  {% if is_owner %}
-    <p>
-      <a href="{% url 'edit_listing' listing.pk %}">Edit Listing</a> |
-      <a href="{% url 'donor_listings' listing.donor.id %}">View My Listings</a> |
-      <a href="{% url 'homepage' %}">Go to Homepage</a>
-    </p>
-    <form action="{% url 'delete_listing' listing.pk %}" method="post" style="display:inline;">
-      {% csrf_token %}
-      <button type="submit" onclick="return confirm('Are you sure you want to delete this listing?');">Delete Listing</button>
-    </form>
-  {% else %}
-    <p><a href="{% url 'homepage' %}">Go to Homepage</a></p>
-  {% endif %}
+    <!-- navigation links section -->
+    <div class="mt-10">
+        <p><a href="{% url 'homepage' %}" class="text-blue-600 hover:underline">Go to Homepage</a></p>
+        {% if is_owner %}
+            <p><a href="{% url 'donor_listings' listing.donor.id %}" class="text-blue-600 hover:underline">View My Listings</a></p>
+        {% endif %}
+    </div>
+</div>
 {% endblock %}
+
+
