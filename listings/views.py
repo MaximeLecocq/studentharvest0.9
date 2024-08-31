@@ -99,7 +99,7 @@ def listing_detail(request, pk):
     is_owner = request.user == listing.donor
 
     #extract ingredients from listing description
-    ingredients = ','.join(get_ingredients_from_listing(listing))  #adapt based on your logic
+    ingredients = ','.join(get_ingredients_from_listing(listing))
 
     #fetch recipe suggestions based on ingredients
     recipes = get_recipe_suggestions(ingredients)
